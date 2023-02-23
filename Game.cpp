@@ -34,8 +34,11 @@ void Game::addValue(int i, int j, int value) {
 void Game::blankRow() {
     for (int i = 0; i < this->rows; i++) {
         for (int j = 0; j < this->cols; j++) {
-            if (board[i][j] == 0)
+            if (board[i][j] == 0) {
                 this->blankRowIndx = this->rows - i;
+                this->blankX = i;
+                this->blankY = j;
+            }
         }
     }
 }
@@ -52,4 +55,53 @@ bool Game::solvability() {
 
     this->blankRow();
     return (inversions % 2 == 0) == (this->blankRowIndx % 2 == 1);
+}
+
+bool Game::compareBoards(Game goalConf) {
+    for (int i = 0; i < this->rows; i++) {
+        for (int j = 0; j < this->cols; j++) {
+            if (this->board[i][j] != goalConf.board[i][j])
+                return false;
+        }
+    }
+    return true;
+}
+
+vector<Game> Game::possibleMoves() {
+    vector<Game> moves;
+    Game move = *this;
+    int x = this->blankX;
+    int y = this->blankY;
+
+    if (x > 0) {
+        move.board[x][y] = move.board[x-1][y];
+        move.board[x-1][y] = 0;
+        moves.push_back(move);
+    }
+
+    if (x < this->rows-1) {
+        move.board[x][y] = move.board[x+1][y];
+        move.board[x+1][y] = 0;
+        moves.push_back(move);
+    }
+
+    if (y > 0) {
+        move.board[x][y] = move.board[x][y-1];
+        move.board[x][y-1] = 0;
+        moves.push_back(move);
+    }
+
+    if (y < this->cols-1) {
+        move.board[x][y] = move.board[x][y+1];
+        move.board[x][y+1] = 0;
+        moves.push_back(move);
+    }
+
+    for (auto &m : moves) // access by reference to avoid copying
+    {    
+        m.printBoard();
+        cout << endl;
+    }
+
+    return moves;
 }

@@ -35,6 +35,9 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    //Print all possible moves
+    initConf.possibleMoves();
+
     return 0;
 }
 
@@ -68,3 +71,30 @@ Game readConfigFile(char* confFile) {
 bool checkIfSolvable(Game initConf, Game goalConf) {
     return initConf.solvability() == goalConf.solvability();
 }
+
+//depth-first search algorithm for solving the 15-puzzle
+/*void DFS(Game initConf, Game goalConf) {
+    int moves = 1;
+    stack<Game> stack;
+    stack.push(initConf);
+    //while the stack is not empty
+    while (!stack.empty()) {
+        //pop the top node from the stack
+        Game cur = stack.top();
+        stack.pop();
+        //if the node is the goal configuration
+        if (cur.compareBoards(goalConf)) {
+            cout << moves << endl;
+        }
+        //else
+        else {
+            //create a vector of nodes with the possible moves
+            vector<Node> possibleMoves = node.possibleMoves();
+            //for each node in the vector
+            for (int i = 0; i < possibleMoves.size(); i++) {
+                //push the node into the stack
+                stack.push(possibleMoves[i]);
+            }
+        }
+    }
+}*/

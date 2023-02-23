@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 #include <vector>
+using namespace std;
+
 
 class Game {
 
@@ -10,12 +12,16 @@ class Game {
         void printBoard();
         void blankRow();
         bool solvability();
+        bool compareBoards(Game goalConf);
+        vector<Game> possibleMoves();
     
     private:
         int** board;
         int rows;
         int cols;
         int blankRowIndx;
+        int blankX;
+        int blankY;
 };
 
 #endif
