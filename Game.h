@@ -16,7 +16,7 @@ class Game {
         vector<Game> possibleMoves();
     
     private:
-        int** board;
+        int board[4][4];
         int rows;
         int cols;
         int blankRowIndx;

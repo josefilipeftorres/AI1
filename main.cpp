@@ -36,7 +36,13 @@ int main(int argc, char* argv[])
     }
 
     //Print all possible moves
-    initConf.possibleMoves();
+    initConf.printBoard();
+    vector<Game> possibles = initConf.possibleMoves();
+    cout << possibles.size() << endl;
+    for (int i = 0; i < possibles.size(); i++) {
+        possibles[i].printBoard();
+    }
+    
 
     return 0;
 }
@@ -45,6 +51,7 @@ int main(int argc, char* argv[])
 Game readConfigFile(char* confFile) {
     // Open the file
     ifstream inputFile(confFile);
+
 
     // Check if the file was opened successfully
     if (!inputFile.is_open()) {
