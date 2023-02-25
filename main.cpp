@@ -1,42 +1,42 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <sstream>
 #include <string>
-#include "Game.h" // Create a Game class
+
+#include "Game.h"  // Create a Game class
 
 using namespace std;
 
 const int SIZE = 4;
 
-Game readConfigFile(char* inputFile);
+void readConfigFile(char* inputFile, Game& initConf, Game& goalConf);
 bool checkIfSolvable(Game initConf, Game goalConf);
+void debugBoard(Game initConf, Game goalConf);
 
-
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     // Check for correct number of arguments
-    if (argc == 1 || argc > 3) {
+    if (argc == 1 || argc > 2) {
         printf("Invalid number of arguments!\n");
         return 1;
     }
 
-    // Read the initial configuration file
-    Game initConf = readConfigFile(argv[1]);
+    // Read the configuration file
+    Game initConf(SIZE);
     Game goalConf(SIZE);
-
-    // Read the goal configuration file
-    if (argc == 3) {
-        // Pode-se definir a goalConf como default (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0) e caso haja um ficheiro de goalConf, substituir a default
-        goalConf = readConfigFile(argv[2]);
-    }
+    readConfigFile(argv[1], initConf, goalConf);
+    
+    // debugBoard(initConf, goalConf);
 
     // Check if its solvable
-    /*if (!checkIfSolvable(initConf, goalConf)) {
+    if (!checkIfSolvable(initConf, goalConf)) {
         printf("The initial configuration is not solvable!\n");
         return 1;
-    }*/
+    }
 
-    //Print all possible moves
-    printf("Initial configuration:\n");
+    debugBoard(initConf, goalConf);
+
+    // Print all possible moves
+    /*printf("Initial configuration:\n");
     initConf.printBoard();
     printf("Goal configuration:\n");
     goalConf.printBoard();
@@ -47,16 +47,14 @@ int main(int argc, char* argv[])
         printf("--------------------\n");
         possibles[i].printBoard();
     }
-    
+    */
 
     return 0;
 }
 
-
-Game readConfigFile(char* confFile) {
+void readConfigFile(char* confFile, Game& initConf, Game& goalConf) {
     // Open the file
     ifstream inputFile(confFile);
-
 
     // Check if the file was opened successfully
     if (!inputFile.is_open()) {
@@ -64,27 +62,53 @@ Game readConfigFile(char* confFile) {
         exit(1);
     }
 
-    // Create a new Game object
-    Game game(SIZE);
-    
-    // Read the configuration file
-    int value;
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            inputFile >> value;
-            game.addValue(i,j, value);
-        }
+    // Read the file
+    string lineINIT, lineGOAL;
+    getline(inputFile, lineINIT);
+    getline(inputFile, lineGOAL);
+
+    // Parse the file
+    stringstream ssINIT(lineINIT);
+    stringstream ssGOAL(lineGOAL);
+
+    // Read the initial configuration
+    vector<int> init;
+    int num = 0;
+    while (ssINIT >> num) {
+        init.push_back(num);
     }
 
+    // Read the goal configuration
+    vector<int> goal;
+    while (ssGOAL >> num) {
+        goal.push_back(num);
+    }
+
+    // Add the values to the board
+    for (int i = 0; i < SIZE; i++) 
+        for (int j = 0; j < SIZE; j++) {
+            initConf.addValue(i, j, init.front());
+            goalConf.addValue(i, j, goal.front());
+
+            init.erase(init.begin());
+            goal.erase(goal.begin());
+        }
+
     inputFile.close();
-    return game;
 }
 
 bool checkIfSolvable(Game initConf, Game goalConf) {
     return initConf.solvability() == goalConf.solvability();
 }
 
-//depth-first search algorithm for solving the 15-puzzle
+void debugBoard(Game initConf, Game goalConf) {
+    printf("Initial configuration:\n");
+    initConf.printBoard();
+    printf("--------------------\n");
+    printf("Goal configuration:\n");
+    goalConf.printBoard();
+}
+// depth-first search algorithm for solving the 15-puzzle
 /*void DFS(Game initConf, Game goalConf) {
     int moves = 1;
     stack<Game> stack;
