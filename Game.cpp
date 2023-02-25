@@ -21,12 +21,29 @@ Game::Game(int size) {
 }
 
 void Game::printBoard() {
+    int maxDigits = 1;
+    int maxValue = this->rows * this->cols;
+    while (maxValue >= 10) {
+        maxDigits++;
+        maxValue /= 10;
+    }
+
     for (int i = 0; i < this->rows; i++) {
-        printf("| ");
+        cout << "| ";
         for (int j = 0; j < this->cols; j++) {
-            printf("%d ", this->board[i][j]);
+            int num = this->board[i][j];
+            int numDigits = 1;
+            while (num >= 10) {
+                numDigits++;
+                num /= 10;
+            }
+            int numSpaces = maxDigits - numDigits;
+            for (int k = 0; k < numSpaces; k++) {
+                cout << " ";
+            }
+            cout << this->board[i][j] << " ";
         }
-        printf("|\n");
+        cout << "|\n";
     }
 }
 
@@ -76,33 +93,35 @@ bool Game::compareBoards(Game goalConf) {
 vector<Game> Game::possibleMoves() {
     vector<Game> moves;
     Game move = *this;
-    move.printBoard();
     int x = this->blankX;
     int y = this->blankY;
-    cout << "blankX: " << x << " blankY: " << y << endl;
 
     if (x > 0 && x < this->rows-1) {
-        move.board[x][y] = move.board[x-1][y];
-        move.board[x-1][y] = 0;
-        moves.push_back(move);
+        Game upMove = *this;
+        upMove.board[x][y] = upMove.board[x-1][y];
+        upMove.board[x-1][y] = 0;
+        moves.push_back(upMove);
     }
 
     if (x < this->rows-1 && x > 0) {
-        move.board[x][y] = move.board[x+1][y];
-        move.board[x+1][y] = 0;
-        moves.push_back(move);
+        Game downMove = *this;
+        downMove.board[x][y] = downMove.board[x+1][y];
+        downMove.board[x+1][y] = 0;
+        moves.push_back(downMove);
     }
 
     if (y > 0 && y < this->cols-1) {
-        move.board[x][y] = move.board[x][y-1];
-        move.board[x][y-1] = 0;
-        moves.push_back(move);
+        Game leftMove = *this;
+        leftMove.board[x][y] = leftMove.board[x][y-1];
+        leftMove.board[x][y-1] = 0;
+        moves.push_back(leftMove);
     }
 
     if (y < this->cols-1 && y > 0) {
-        move.board[x][y] = move.board[x][y+1];
-        move.board[x][y+1] = 0;
-        moves.push_back(move);
+        Game rightMove = *this;
+        rightMove.board[x][y] = rightMove.board[x][y+1];
+        rightMove.board[x][y+1] = 0;
+        moves.push_back(rightMove);
     }
 
     return moves;

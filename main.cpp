@@ -30,16 +30,21 @@ int main(int argc, char* argv[])
     }
 
     // Check if its solvable
-    if (!checkIfSolvable(initConf, goalConf)) {
+    /*if (!checkIfSolvable(initConf, goalConf)) {
         printf("The initial configuration is not solvable!\n");
         return 1;
-    }
+    }*/
 
     //Print all possible moves
+    printf("Initial configuration:\n");
     initConf.printBoard();
+    printf("Goal configuration:\n");
+    goalConf.printBoard();
+    printf("--------------------\n");
+    printf("Possible moves:\n");
     vector<Game> possibles = initConf.possibleMoves();
-    cout << possibles.size() << endl;
     for (int i = 0; i < possibles.size(); i++) {
+        printf("--------------------\n");
         possibles[i].printBoard();
     }
     
