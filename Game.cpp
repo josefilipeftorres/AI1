@@ -38,6 +38,19 @@ Game::Game(const Game& other) {
     this->parent = other.parent;
 }
 
+void Game::hashMaker() {
+    int hash = 0;
+    string str = "";
+    for (int i = 0; i < this->rows; i++) {
+        for (int j = 0; j < this->cols; j++) {
+            str += to_string(this->board[i][j]);
+        }
+    }
+    std::hash<std::string> hasher;
+    this->id = hasher(str);
+    //printf("%d\n",id);
+}
+
 void Game::printBoard() {
     int maxDigits = 1;
     int maxValue = this->rows * this->cols;
@@ -146,6 +159,7 @@ vector<Game*> Game::possibleMoves() {
         up->swap(x, y, x - 1, y);
         up->updateBlankPosition(x - 1, y);
         up->path += 'U';
+        up->hashMaker();
         moves.push_back(up);
     }
 
@@ -155,6 +169,7 @@ vector<Game*> Game::possibleMoves() {
         down->swap(x, y, x + 1, y);
         down->updateBlankPosition(x + 1, y);
         down->path += 'D';
+        down->hashMaker();
         moves.push_back(down);
     }
 
@@ -164,6 +179,7 @@ vector<Game*> Game::possibleMoves() {
         left->swap(x, y, x, y - 1);
         left->updateBlankPosition(x, y - 1);
         left->path += 'L';
+        left->hashMaker();
         moves.push_back(left);
     }
 
@@ -173,6 +189,7 @@ vector<Game*> Game::possibleMoves() {
         right->swap(x, y, x, y + 1);
         right->updateBlankPosition(x, y + 1);
         right->path += 'R';
+        right->hashMaker();
         moves.push_back(right);
     }
     return moves;
@@ -191,6 +208,10 @@ void Game::updateBlankPosition(int x, int y) {
 
 void Game::setVisited() {
     this->visited = true;
+}
+
+int Game::getId() {
+    return this->id;
 }
 
 bool Game::isVisited() {
@@ -226,7 +247,7 @@ GameData::GameData() {
 }
 
 void GameData::printData() {
-    printf("Steps: %d\n", this->path.size());
+    printf("Steps: %lu\n", this->path.size());
     string path_copy = this->path;
     printf("Path: %s\n", path_copy.c_str());
     printf("Expanded Nodes: %d\n", this->expandedNodes);

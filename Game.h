@@ -15,6 +15,8 @@ class Game {
         vector<Game*> possibleMoves();
         void swap(int x1, int y1, int x2, int y2);
         void updateBlankPosition(int x, int y);
+        void hashMaker();
+        size_t getId();
 
         bool solvability();
         void setPiece(int i, int j, int value);
@@ -32,6 +34,7 @@ class Game {
         int board[4][4];
         bool visited;
         vector<int> pieces;
+        int id;
         int rows, cols;
         int blankX, blankY;
         string path;
