@@ -1,7 +1,11 @@
+#include <climits>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
+#include <queue>
+#include <stdlib.h>
 
 #include "Game.h"  // Create a Game class
 
@@ -9,22 +13,28 @@ using namespace std;
 
 const int SIZE = 4;
 
-void readConfigFile(char* inputFile, Game& initConf, Game& goalConf);
-bool checkIfSolvable(Game initConf, Game goalConf);
-void debugBoard(Game initConf, Game goalConf);
+void readConfigFile(char* inputFile, Game* initConf, Game* goalConf);
+bool checkIfSolvable(Game* initConf, Game* goalConf);
+void debugBoard(Game* initConf, Game* goalConf);
+void BFS(Game* initConf, Game* goalConf);
 
 int main(int argc, char* argv[]) {
+    system("clear"); 
+
     // Check for correct number of arguments
-    if (argc == 1 || argc > 2) {
+    if (argc == 1 || argc > 3) {
         printf("Invalid number of arguments!\n");
         return 1;
     }
 
+    // Get the algorithm to run
+    string algorithm = argv[1];
+
     // Read the configuration file
-    Game initConf(SIZE);
-    Game goalConf(SIZE);
-    readConfigFile(argv[1], initConf, goalConf);
-    
+    Game* initConf = new Game(SIZE);
+    Game* goalConf = new Game(SIZE);
+    readConfigFile(argv[2], initConf, goalConf);
+
     // debugBoard(initConf, goalConf);
 
     // Check if its solvable
@@ -33,26 +43,20 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    debugBoard(initConf, goalConf);
+    // debugBoard(initConf, goalConf);
 
-    // Print all possible moves
-    /*printf("Initial configuration:\n");
-    initConf.printBoard();
-    printf("Goal configuration:\n");
-    goalConf.printBoard();
-    printf("--------------------\n");
-    printf("Possible moves:\n");
-    vector<Game> possibles = initConf.possibleMoves();
-    for (int i = 0; i < possibles.size(); i++) {
-        printf("--------------------\n");
-        possibles[i].printBoard();
+    // Run the algorithm
+    if (algorithm == "BFS") {
+        BFS(initConf, goalConf);
+    } else {
+        printf("Invalid algorithm!\n");
+        return 1;
     }
-    */
 
     return 0;
 }
 
-void readConfigFile(char* confFile, Game& initConf, Game& goalConf) {
+void readConfigFile(char* confFile, Game* initConf, Game* goalConf) {
     // Open the file
     ifstream inputFile(confFile);
 
@@ -85,52 +89,101 @@ void readConfigFile(char* confFile, Game& initConf, Game& goalConf) {
     }
 
     // Add the values to the board
-    for (int i = 0; i < SIZE; i++) 
+    for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            initConf.addValue(i, j, init.front());
-            goalConf.addValue(i, j, goal.front());
+            initConf->setPiece(i, j, init.front());
+            goalConf->setPiece(i, j, goal.front());
 
             init.erase(init.begin());
             goal.erase(goal.begin());
         }
-
+    }
     inputFile.close();
 }
 
-bool checkIfSolvable(Game initConf, Game goalConf) {
-    return initConf.solvability() == goalConf.solvability();
+bool checkIfSolvable(Game* initConf, Game* goalConf) {
+    return initConf->solvability() == goalConf->solvability();
 }
 
-void debugBoard(Game initConf, Game goalConf) {
+void debugBoard(Game* initConf, Game* goalConf) {
+    
     printf("Initial configuration:\n");
-    initConf.printBoard();
+    // initConf->setVisited();
+    initConf->printBoard();
+    printf("%d\n", initConf->isVisited());
+    
     printf("--------------------\n");
+    
     printf("Goal configuration:\n");
-    goalConf.printBoard();
+    goalConf->printBoard();
+
+    printf("--------------------\n");
+
+    // printf("Possible moves:\n");
+    // vector<Game*> possibleMoves = initConf->possibleMoves();
+
+    // for (int i = 0; i < possibleMoves.size(); i++) {
+    //     printf("--------------------\n");
+    //     possibleMoves[i]->printBoard();
+    //     cout << possibleMoves[i]->getPath() << " " << possibleMoves[i]->isVisited() << endl;
+    // }
 }
-// depth-first search algorithm for solving the 15-puzzle
-/*void DFS(Game initConf, Game goalConf) {
-    int moves = 1;
-    stack<Game> stack;
-    stack.push(initConf);
-    //while the stack is not empty
-    while (!stack.empty()) {
-        //pop the top node from the stack
-        Game cur = stack.top();
-        stack.pop();
-        //if the node is the goal configuration
-        if (cur.compareBoards(goalConf)) {
-            cout << moves << endl;
+
+void BFS(Game* initConf, Game* goalConf) {
+    queue<Game*> q;
+    q.push(initConf);
+    initConf->setVisited();
+
+    GameData data;
+    // data.printData();
+    
+    while(!q.empty()) {
+        // Get the next node and remove it from the queue to evaluate
+        Game* cur = q.front();
+        q.pop();
+        data.incrementExpandedNodes();
+
+        // Check if the current node is the goal node
+        if(cur->compareBoards(*goalConf)) {
+            printf("Found the goal configuration!\n");
+            cur->printBoard();
+            data.setPath(cur->getPath());
+            data.printData();
+            return;
         }
-        //else
-        else {
-            //create a vector of nodes with the possible moves
-            vector<Node> possibleMoves = node.possibleMoves();
-            //for each node in the vector
-            for (int i = 0; i < possibleMoves.size(); i++) {
-                //push the node into the stack
-                stack.push(possibleMoves[i]);
+        
+        // cout << cur->getPath() << endl;
+        // printf("Current node:\n");
+        // cur->printBoard();
+        // printf("--------------------\n");
+        
+        // Get the possible moves from the current node
+        vector<Game*> possibleMoves = cur->possibleMoves();
+        // Debug for possibleMoves
+        
+        // for (int i = 0; i < possibleMoves.size(); i++) {
+        //     vector<Game*> p = possibleMoves[i]->possibleMoves();
+        //     printf("Current node:\n");
+        //     possibleMoves[i]->printBoard();
+        //     printf("Visited: %d\n", possibleMoves[i]->isVisited());
+        //     printf("--------------------\n");
+        //     for (int j = 0; j < p.size(); j++) {
+        //         p[j]->printBoard();
+        //         printf("Visited: %d\n", p[j]->isVisited());
+        //         printf("--------------------\n");
+        //     }
+        // }
+        // return;
+    
+        for (int i = 0; i < possibleMoves.size(); i++) {
+            Game* nextMove = possibleMoves[i];
+            if (!nextMove->isVisited()) {
+                nextMove->setVisited();
+                q.push(nextMove);
+                data.incrementMemoryUsed();
+            } else {
+                delete nextMove;
             }
         }
     }
-}*/
+}

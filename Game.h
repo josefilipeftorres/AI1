@@ -2,27 +2,61 @@
 #define GAME_H
 #include <vector>
 #include <string>
+#include <iostream>
 using namespace std;
-
 
 class Game {
 
     public:
         Game(int size);
-        void addValue(int i, int j, int value);
-        void printBoard();
+        Game(const Game& other);
+        
+        bool compareBoards(const Game& other) const;
+        vector<Game*> possibleMoves();
+        void swap(int x1, int y1, int x2, int y2);
+        void updateBlankPosition(int x, int y);
+
         bool solvability();
-        bool compareBoards(Game goalConf);
-        vector<Game> possibleMoves();
-    
+        void setPiece(int i, int j, int value);
+        
+        void setVisited();
+        bool isVisited();
+        
+        void setParent(Game* parent);
+        Game* getParent();
+        string getPath();
+        void setPath(string p);
+        void printBoard();
+        
     private:
         int board[4][4];
-        // string moves[4] = {"up", "down", "left", "right"};
+        bool visited;
         vector<int> pieces;
-        int rows;
-        int cols;
-        int blankX;
-        int blankY;
+        int rows, cols;
+        int blankX, blankY;
+        string path;
+        Game* parent;
+};
+
+class GameData {
+    public:
+        GameData();
+        void printData();
+        
+        void incrementExpandedNodes();
+        int getExpandedNodes() const;
+        
+        void incrementMemoryUsed();
+        int getMemoryUsed() const;
+        
+        void setPath(string path);
+        string getPath() const;
+
+    private:
+        int expandedNodes;
+        int memoryUsed;
+        clock_t startTime;
+        string path;
 };
 
 #endif
