@@ -6,6 +6,7 @@
 
 using namespace std;
 
+// Constructors
 Game::Game(int size) {
     this->rows = size;
     this->cols = size;
@@ -35,22 +36,35 @@ Game::Game(const Game& other) {
     }
     this->path = other.path;
     // this->visited = other.visited;
-    this->parent = other.parent;
+    // this->parent = other.parent;
 }
 
-void Game::hashMaker() {
-    int hash = 0;
-    string str = "";
-    for (int i = 0; i < this->rows; i++) {
-        for (int j = 0; j < this->cols; j++) {
-            str += to_string(this->board[i][j]);
+// Test the solvability of the board
+bool Game::solvability() {
+    int inversions = 0;
+    
+    // for(int i: this->pieces)
+    //     printf("%d ", i);
+    // printf("\n");
+    
+    for (int i = 0; i < this->pieces.size(); i++) {
+        if (this->pieces[i] == 0)
+            continue;
+        int count = 0;
+        for (int j = i + 1; j < this->pieces.size(); j++) {
+            if (this->pieces[j] == 0)
+                continue;
+            if (this->pieces[i] > this->pieces[j])
+                count++;
         }
+        inversions += count;
     }
-    std::hash<std::string> hasher;
-    this->id = hasher(str);
-    //printf("%d\n",id);
+    // printf("inversions: %d\n", inversions);
+    // printf("blankX: %d\n", this->rows - this->blankX);
+    return (inversions % 2 == 0) == ((this->rows - this->blankX) % 2 == 1);
 }
 
+// Print the board
 void Game::printBoard() {
     int maxDigits = 1;
     int maxValue = this->rows * this->cols;
@@ -79,6 +93,18 @@ void Game::printBoard() {
     }
 }
 
+// Compare two boards to find the solution
+bool Game::compareBoards(Game* other) {
+    for (int i = 0; i < this->rows; i++) {
+        for (int j = 0; j < this->cols; j++) {
+            if (this->board[i][j] != other->board[i][j])
+                return false;
+        }
+    }
+    return true;
+}
+
+// Update positions
 void Game::setPiece(int i, int j, int value) {
     this->board[i][j] = value;
     this->pieces.push_back(value);
@@ -88,70 +114,23 @@ void Game::setPiece(int i, int j, int value) {
     }
 }
 
-bool Game::solvability() {
-    int inversions = 0;
-    
-    // for(int i: this->pieces)
-    //     printf("%d ", i);
-    // printf("\n");
-    
-    for (int i = 0; i < this->pieces.size(); i++) {
-        if (this->pieces[i] == 0)
-            continue;
-        int count = 0;
-        for (int j = i + 1; j < this->pieces.size(); j++) {
-            if (this->pieces[j] == 0)
-                continue;
-            if (this->pieces[i] > this->pieces[j])
-                count++;
-        }
-        inversions += count;
-    }
-    // printf("inversions: %d\n", inversions);
-    // printf("blankX: %d\n", this->rows - this->blankX);
-    return (inversions % 2 == 0) == ((this->rows - this->blankX) % 2 == 1);
+void Game::swap(int x1, int y1, int x2, int y2) {
+    int temp = board[x1][y1];
+    board[x1][y1] = board[x2][y2];
+    board[x2][y2] = temp;
 }
 
-bool Game::compareBoards(const Game& other) const {
-    for (int i = 0; i < this->rows; i++) {
-        for (int j = 0; j < this->cols; j++) {
-            if (this->board[i][j] != other.board[i][j])
-                return false;
-        }
-    }
-    return true;
+void Game::updateBlankPosition(int x, int y) {
+    this->blankX = x;
+    this->blankY = y;
 }
 
+// Generate possible moves from the current board
 vector<Game*> Game::possibleMoves() {
     vector<Game*> moves;
 
     int x = this->blankX;
     int y = this->blankY;
-    
-    /*
-    vector<pair<int,int>> directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-    for (const auto& dir: directions) {
-        int newBlankX = x + dir.first;
-        int newBlankY = y + dir.second;
-
-        if (newBlankX >= 0 && newBlankX < rows && newBlankY >= 0 && newBlankY < cols) { 
-            // Create a new object to represent the move
-            Game* newGame = new Game(*this);
-
-            // Swap the blank piece with the piece in the direction
-            newGame->swap(x, y, newBlankX, newBlankY);
-
-            // Set the parent of the new game to the current game
-            newGame->setParent(this);
-
-            // Update the blank position
-            newGame->updateBlankPosition(newBlankX, newBlankY);
-
-            // Add the new game to the list of possible moves
-            moves.push_back(newGame);
-        }
-    }
-    */
     
     // Move blank piece up
     if (x > 0) {
@@ -195,35 +174,51 @@ vector<Game*> Game::possibleMoves() {
     return moves;
 }
 
-void Game::swap(int x1, int y1, int x2, int y2) {
-    int temp = board[x1][y1];
-    board[x1][y1] = board[x2][y2];
-    board[x2][y2] = temp;
+// Hash function to create unique id for each board
+void Game::hashMaker() {
+    int hash = 0;
+    string str = "";
+    for (int i = 0; i < this->rows; i++) {
+        for (int j = 0; j < this->cols; j++) {
+            str += to_string(this->board[i][j]);
+        }
+    }
+    std::hash<std::string> hasher;
+    this->id = hasher(str);
+    //printf("%d\n",id);
 }
 
-void Game::updateBlankPosition(int x, int y) {
-    this->blankX = x;
-    this->blankY = y;
+// Heuristic functions
+int Game::misplacedTiles(Game* goal) {
+    int count = 0;
+    for (int i = 0; i < this->rows; i++) {
+        for (int j = 0; j < this->cols; j++) {
+            if (this->board[i][j] != goal->board[i][j])
+                count++;
+        }
+    }
+    return count;
 }
 
-void Game::setVisited() {
-    this->visited = true;
+int Game::manhattanDistance(Game* goal) {
+    int distance = 0;
+    for (int i = 0; i < this->rows; i++) {
+        for (int j = 0; j < this->cols; j++) {
+            int value = this->board[i][j];
+            if (value == 0)
+                continue;
+            int x = (value - 1) / this->cols;
+            int y = (value - 1) % this->cols;
+            distance += abs(x - i) + abs(y - j);
+        }
+    }
+    return distance;
 }
 
-int Game::getId() {
+
+// Setters and getters for the private variables
+size_t Game::getId() {
     return this->id;
-}
-
-bool Game::isVisited() {
-    return this->visited;
-}
-
-void Game::setParent(Game* parent) {
-    this->parent = parent;
-}
-
-Game* Game::getParent() {
-    return this->parent;
 }
 
 string Game::getPath() {
@@ -234,47 +229,38 @@ void Game::setPath(string p) {
     this->path = p;
 }
 
-
-/*
-    GameData
-*/
-
-GameData::GameData() {
-    this->expandedNodes = 0;
-    this->memoryUsed = 0;
-    this->path = "";
-    this->startTime = clock();
+void Game::setH(int h) {
+    this->h = h;
 }
 
-void GameData::printData() {
-    printf("Steps: %lu\n", this->path.size());
-    string path_copy = this->path;
-    printf("Path: %s\n", path_copy.c_str());
-    printf("Expanded Nodes: %d\n", this->expandedNodes);
-    printf("Memory Used: %d\n", this->memoryUsed);
-    printf("Time Taken: %fs\n", ((float)(clock() - this->startTime)) / CLOCKS_PER_SEC);
+void Game::setG(int g) {
+    this->g = g;
 }
 
-void GameData::incrementExpandedNodes() {
-    this->expandedNodes++;
+int Game::getG() {
+    return this->g;
 }
 
-int GameData::getExpandedNodes() const {
-    return expandedNodes;
+void Game::setF(int f) {
+    this->f = f;
 }
 
-void GameData::incrementMemoryUsed() {
-    this->memoryUsed++;
+int Game::getF() {
+    return this->f;
 }
 
-int GameData::getMemoryUsed() const {
-    return this->memoryUsed;
-}
+// void Game::setParent(Game* parent) {
+//     this->parent = parent;
+// }
 
-void GameData::setPath(string path) {
-    this->path += path;
-}
+// Game* Game::getParent() {
+//     return this->parent;
+// }
 
-string GameData::getPath() const {
-    return this->path;
-}
+// void Game::setVisited() {
+//     this->visited = true;
+// }
+
+// bool Game::isVisited() {
+//     return this->visited;
+// }
