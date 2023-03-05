@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "GameData.h"
 
 using namespace std;
 
@@ -231,6 +232,10 @@ void Game::setPath(string p) {
 
 void Game::setH(int h) {
     this->h = h;
+}
+
+int Game::getH() {
+    return this->h;
 }
 
 void Game::setG(int g) {

@@ -37,6 +37,7 @@ class Game {
         int getG();          
         void setF(int f);   // f(n) = g(n) + h(n)
         int getF(); 
+        int getH();
 
         int manhattanDistance(Game* goal);        
         

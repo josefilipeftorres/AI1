@@ -23,9 +23,11 @@ void readConfigFile(char* inputFile, Game* initConf, Game* goalConf);
 bool checkIfSolvable(Game* initConf, Game* goalConf);
 void debugBoard(Game* initConf, Game* goalConf);
 void BFS(Game* initConf, Game* goalConf);
-void DFS(Game* initConf, Game* goalConf);
+bool DFS(Game* initConf, Game* goalConf, int depth);
+void IDFS(Game* initConf, Game* goalConf);
 void AStarMisplacedTiles(Game* initConf, Game* goalConf);
 void AStarManhattanDistance(Game* initConf, Game* goalConf);
+void GreedyManhattan(Game* initConf, Game* goalConf);
 
 int main(int argc, char* argv[]) {
     system("clear"); 
@@ -58,7 +60,9 @@ int main(int argc, char* argv[]) {
     if (algorithm == "BFS") {
         BFS(initConf, goalConf);
     } else if(algorithm == "DFS") {
-        DFS(initConf, goalConf);
+        DFS(initConf, goalConf,20);
+    } else if(algorithm == "IDFS") {
+        IDFS(initConf, goalConf);
     } else if(algorithm == "A*-misplaced") {
         AStarMisplacedTiles(initConf, goalConf);
     } else if(algorithm == "A*-Manhattan") {
@@ -67,6 +71,7 @@ int main(int argc, char* argv[]) {
         // GreedyMisplaced(initConf, goalConf);
     } else if(algorithm == "Greedy-Manhattan") {
         // GreedyManhattan(initConf, goalConf);
+        GreedyManhattan(initConf, goalConf);
     }  else {
         printf("Invalid algorithm!\n");
         return 1;
@@ -211,70 +216,64 @@ void BFS(Game* initConf, Game* goalConf) {
     }
 }
 
-void DFS(Game* initConf, Game* goalConf) {
-    stack<Game*> s;
-    s.push(initConf);
+bool DFS(Game* initConf, Game* goalConf, int depth) {
+    stack<pair<Game*, int>> s; // store current depth of each node
+    s.push(make_pair(initConf, 0));
     initConf->hashMaker();
     unordered_set<size_t> visited;
-    unordered_set<size_t> shadow;
     visited.insert(initConf->getId());
-
     GameData data;
-    // data.printData();
-    int counter=0;
     while(!s.empty()) {
         // Get the next node and remove it from the stack to evaluate
-        Game* cur = s.top();
+        auto cur = s.top();
         s.pop();
-        shadow.insert(cur->getId());
         data.incrementExpandedNodes();
 
         // Check if the current node is the goal node
-        if(cur->compareBoards(goalConf)) {
+        if(cur.first->compareBoards(goalConf)) {
             printf("Found the goal configuration!\n");
-            cur->printBoard();
-            data.setPath(cur->getPath());
+            cur.first->printBoard();
+            data.setPath(cur.first->getPath());
             data.printData();
-            return;
+            return true;
+        }
+
+        // Check if we have reached the maximum depth
+        if (cur.second >= depth) {
+            continue;
         }
         
-        //  cout << cur->getPath() << endl;
-        //  printf("Current node:\n");
-         cur->printBoard();
-         printf("--------------------\n");
-        
         // Get the possible moves from the current node
-        vector<Game*> possibleMoves = cur->possibleMoves();
-        // Debug for possibleMoves
-        
-        /*for (int i = 0; i < possibleMoves.size(); i++) {
-             vector<Game*> p = possibleMoves[i]->possibleMoves();
-             printf("Current node:\n");
-             possibleMoves[i]->printBoard();
-             printf("Visited: %d\n", possibleMoves[i]->isVisited());
-             printf("--------------------\n");
-             for (int j = 0; j < p.size(); j++) {
-                 p[j]->printBoard();
-                 printf("Visited: %d\n", p[j]->isVisited());
-                 printf("--------------------\n");
-             }
-         }
-         return;*/
-    
+        vector<Game*> possibleMoves = cur.first->possibleMoves();
+       
         //Add the child nodes to the stack in a reverse order, so that the algorithm explores them in a depth-first order
         for (int i = possibleMoves.size() - 1; i >= 0; i--) {
             Game* nextMove = possibleMoves[i];
             if (visited.find(nextMove->getId()) == visited.end()) {
                 visited.insert(nextMove->getId());
-                s.push(nextMove);
+                s.push(make_pair(nextMove, cur.second + 1));
                 data.incrementMemoryUsed();
             } else {
                 delete nextMove;
             }
         }
-        // visited.clear();
     }
+    return false;
 }
+
+
+void IDFS(Game* initConf, Game* goalConf) {
+    int i = 0;
+    cout << "Currently exploring depth 0\n";
+    while (!DFS(initConf,goalConf, i))
+    {
+        cout << "Currently exploring depth " << (++i) << '\n';
+    }
+    return;
+}
+
+
+
 
 void AStarMisplacedTiles(Game* initConf, Game* goalConf) {
     // priority_queue<Game*, vector<Game*>, function<bool(Game*, Game*)>> pq(
@@ -384,6 +383,56 @@ void AStarManhattanDistance(Game* initConf, Game* goalConf) {
 
             int f = g + h;
             nextMove->setF(f);
+
+            if (visited.find(nextMove->getId()) == visited.end()) {
+                visited.insert(nextMove->getId());
+                pq.push(nextMove);
+                data.incrementMemoryUsed();
+            } else {
+                delete nextMove;
+            }
+        }
+    }
+}
+
+
+void GreedyManhattan(Game* initConf, Game* goalConf) {
+    struct GreedyManhattanCompare {
+        bool operator()(Game* game1, Game* game2) const {
+            return game1->getH() > game2->getH();
+        }
+    };
+    priority_queue<Game*, vector<Game*>, GreedyManhattanCompare> pq;
+
+    initConf->setH(initConf->manhattanDistance(goalConf));
+    pq.push(initConf);
+
+    initConf->hashMaker();
+    unordered_set<size_t> visited;
+    visited.insert(initConf->getId());
+
+    GameData data;
+
+    while(!pq.empty()) {
+        Game* cur = pq.top();
+        pq.pop();
+
+        data.incrementExpandedNodes();
+
+        if(cur->compareBoards(goalConf)) {
+            printf("Found the goal configuration!\n");
+            cur->printBoard();
+            data.setPath(cur->getPath());
+            data.printData();
+            return;
+        }
+
+        vector<Game*> possibleMoves = cur->possibleMoves();
+        for (int i = 0; i < possibleMoves.size(); i++) {
+            Game* nextMove = possibleMoves[i];
+
+            int h = nextMove->manhattanDistance(goalConf);
+            nextMove->setH(h);
 
             if (visited.find(nextMove->getId()) == visited.end()) {
                 visited.insert(nextMove->getId());
