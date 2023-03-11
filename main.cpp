@@ -228,7 +228,6 @@ bool DFS(Game* initConf, Game* goalConf, int depth) {
         auto cur = s.top();
         s.pop();
         data.incrementExpandedNodes();
-
         // Check if the current node is the goal node
         if(cur.first->compareBoards(goalConf)) {
             printf("Found the goal configuration!\n");
@@ -240,6 +239,8 @@ bool DFS(Game* initConf, Game* goalConf, int depth) {
 
         // Check if we have reached the maximum depth
         if (cur.second >= depth) {
+            //linha mágica 
+            visited.clear();
             continue;
         }
         
@@ -257,6 +258,7 @@ bool DFS(Game* initConf, Game* goalConf, int depth) {
                 delete nextMove;
             }
         }
+    
     }
     return false;
 }
