@@ -1,8 +1,30 @@
+/*
+    Métodos da classe Game:
+        - Game(int size): construtor da classe Game
+        - Game(const Game& other): construtor de cópia da classe Game
+        - solvability(): verifica se o tabuleiro é resolvível
+        - setPiece(int i, int j, int value): atribui o valor da peça na posição (i, j)
+        - setParent(Game* parent): atribui o nó pai
+        - getParent(): retorna o nó pai
+        - getPath(): retorna o caminho percorrido até o nó
+        - setPath(string p): atribui o caminho percorrido até o nó
+        - printBoard(): imprime o tabuleiro
+        - misplacedTiles(Game* goal): retorna o número de peças fora do lugar
+        - manhattanDistance(Game* goal): retorna a distância de Manhattan
+        - setH(int h): atribui o valor da heurística
+        - getH(): retorna o valor da heurística
+        - setG(int g): atribui o valor do custo
+        - getG(): retorna o valor do custo
+        - setF(int f): atribui o valor da função f(n)
+        - getF(): retorna o valor da função f(n)
+*/
+
 #include "Game.h"
 
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
+
 #include "GameData.h"
 
 using namespace std;
@@ -21,7 +43,6 @@ Game::Game(int size) {
         }
     }
     board[this->rows - 1][this->cols - 1] = 0;
-    // this->visited = false;
 }
 
 Game::Game(const Game& other) {
@@ -29,25 +50,24 @@ Game::Game(const Game& other) {
     this->cols = other.cols;
     this->blankX = other.blankX;
     this->blankY = other.blankY;
-    
+
     for (int i = 0; i < this->rows; i++) {
         for (int j = 0; j < this->cols; j++) {
             this->board[i][j] = other.board[i][j];
         }
     }
     this->path = other.path;
-    // this->visited = other.visited;
     // this->parent = other.parent;
 }
 
 // Test the solvability of the board
 bool Game::solvability() {
     int inversions = 0;
-    
+
     // for(int i: this->pieces)
     //     printf("%d ", i);
     // printf("\n");
-    
+
     for (int i = 0; i < this->pieces.size(); i++) {
         if (this->pieces[i] == 0)
             continue;
@@ -69,7 +89,7 @@ bool Game::solvability() {
 void Game::printBoard() {
     int maxDigits = 1;
     int maxValue = this->rows * this->cols;
-    
+
     while (maxValue >= 10) {
         maxDigits++;
         maxValue /= 10;
@@ -132,7 +152,7 @@ vector<Game*> Game::possibleMoves() {
 
     int x = this->blankX;
     int y = this->blankY;
-    
+
     // Move blank piece up
     if (x > 0) {
         Game* up = new Game(*this);
@@ -144,7 +164,7 @@ vector<Game*> Game::possibleMoves() {
     }
 
     // Move blank piece down
-    if (x < rows - 1) { 
+    if (x < rows - 1) {
         Game* down = new Game(*this);
         down->swap(x, y, x + 1, y);
         down->updateBlankPosition(x + 1, y);
@@ -186,7 +206,7 @@ void Game::hashMaker() {
     }
     std::hash<std::string> hasher;
     this->id = hasher(str);
-    //printf("%d\n",id);
+    // printf("%d\n",id);
 }
 
 // Heuristic functions
@@ -215,7 +235,6 @@ int Game::manhattanDistance(Game* goal) {
     }
     return distance;
 }
-
 
 // Setters and getters for the private variables
 size_t Game::getId() {
@@ -260,12 +279,4 @@ int Game::getF() {
 
 // Game* Game::getParent() {
 //     return this->parent;
-// }
-
-// void Game::setVisited() {
-//     this->visited = true;
-// }
-
-// bool Game::isVisited() {
-//     return this->visited;
 // }

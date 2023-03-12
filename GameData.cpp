@@ -1,8 +1,19 @@
+/*
+    Métodos da classe GameData:
+        - printData(): imprime os dados do jogo
+        - incrementExpandedNodes(): incrementa o número de nós expandidos
+        - getExpandedNodes(): retorna o número de nós expandidos
+        - incrementMemoryUsed(): incrementa o número de nós na memória
+        - getMemoryUsed(): retorna o número de nós na memória
+        - setPath(string path): adiciona o caminho percorrido
+        - getPath(): retorna o caminho percorrido
+*/
+
 #include "GameData.h"
 
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
 
 GameData::GameData() {
     this->expandedNodes = 0;

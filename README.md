@@ -1,3 +1,4 @@
+
 # Buscas para o 15-puzzle game
 Trabalho desenvolvido para a cadeira de Inteligência Artifical (CC2006) da Faculdade de Ciências da Universidade do Porto.
 
@@ -35,44 +36,44 @@ Por exemplo, *ConfigSol12.txt*:
 
 | Algortimo           |BFS	        |DFS		      |IDFS |A*-MisplacedTiles	|A*-Manhattan |Greedy-Manhattan 	| Greedy-MisplacedTiles	|
 |---------------------|-------------|-------------|-----|-------------------|-------------|------------|------|
-|Path          	 			|DLLURRRULDDR	|							|DLLURRRULDDR			|DLLURRRULDDR				|DLLURRRULDDR	|DLLURRRULDDR	| RULDDLLURRDR |
-|Steps          			|12						|							|12			|12									|12						|12	|12
-|Nº of Expanded Nodes	|17889				|							|486578			|68									|26						|15	|17
-|Memory Used					|35728				|							|486588			|140								|52						|32	|39
-|Time									|0.053206s		|							|0.501213s			|0.000260s					|0.000137s		|0.000079s	| 0.000089s
+|Path          	 			|DLLURRRULDDR	|URDLURDLDLLURRDR							|DLLURRRULDDR			|DLLURRRULDDR				|DLLURRRULDDR	|DLLURRRULDDR	| RULDDLLURRDR |
+|Steps          			|12						|16							|12			|12									|12						|12	|12
+|Nº of Expanded Nodes	|17889				|244175							|486578			|68									|26						|15	|17
+|Memory Used					|35728				|244182							|486588			|140								|52						|32	|39
+|Time									|0.053206s		|0.445438s							|0.501213s			|0.000260s					|0.000137s		|0.000079s	| 0.000089s
 
  2. *ConfigSol16.txt*
  
 | Algoritmo					|BFS|DFS|IDFS|A*-MisplacedTiles|A*-Manhattan|Greedy-Manhattan|Greedy-MisplacedTiles|
 |-------------------|--|--|--|--|--|--|--|
-|Path 							|RRULDRRDLDLLURRU| | |RRULDRRDLDLLURRU|RRRDLDLLURRUULDR| |RRRDLUULDRDDLLURRU
-|Steps							|16| | |16|16| |18			
-|Nº Expanded Nodes	|279222| | |110|212106| |24
-|Memory Used				|545378| | |249|406765| |57
-|Time								|1.059529s| | |0.000451s|1.040513s|	|0.000118s	 
+|Path 							|RRULDRRDLDLLURRU|RRDDLULDRURUULDDLDRUURRDLU | |RRULDRRDLDLLURRU|RRRDLDLLURRUULDR| |RRRDLUULDRDDLLURRU
+|Steps							|16|26 | |16|16| |18			
+|Nº Expanded Nodes	|279222|1595317 | |110|212106| |24
+|Memory Used				|545378|1595336 | |249|406765| |57
+|Time								|1.059529s|3.147430s | |0.000451s|1.040513s|	|0.000118s	 
 
  3. *ConfigSol7.txt*
 
 |Algoritmo|BFS|DFS|IDFS|A*-MisplacedTiles|A*-Manhattan|Greedy-Manhattan|Greedy-MisplacedTiles|
 |--|--|--|--|--|--|--|--|
-|Path|UURDRDR|UUURDDDRLUUULDRDRDR|UURDRDR|UURDRDR|UURDRDR|UURDRDR|UURDRDR|
-|Steps|7|19|7|7|7|7|7|
-|Nº Expanded Nodes|231|711782|107|8|8|8|8
-|Memory Used|474|711802|112|17|17|17|17|
-|Time|0.000694s|0.764366s|0.000155s|0.000054s|0.000051s|0.000048s|0.000052s|
+|Path|UURDRDR|UUURRDDDRULUULLDRDRRD|UURDRDR|UURDRDR|UURDRDR|UURDRDR|UURDRDR|
+|Steps|7|21|7|7|7|7|7|
+|Nº Expanded Nodes|231|64170|107|8|8|8|8
+|Memory Used|474|64181|112|17|17|17|17|
+|Time|0.000694s|0.100068s|0.000155s|0.000054s|0.000051s|0.000048s|0.000052s|
 
 
  4. *ConfigSol1.txt*
 
 |Algoritmo|BFS|DFS|IDFS|A*-MisplacedTiles|A*-Manhattan|Greedy-Manhattan|Greedy-MisplacedTiles
 |--|--|--|--|--|--|--|--|
-|Path|R|UUULDDDRUDLUUURDDDR|R|R|R|R|R|
-|Steps|1|19|1|1|1|1|1|
-|Nº Expanded Nodes|4|369441|4|2|2|2|2|
+|Path|R|R|R|R|R|R|R|
+|Steps|1|117681|1|1|1|1|1|
+|Nº Expanded Nodes|4|117680|4|2|2|2|2|
 |Memory Used|8|369470|3|3|3|3|3|
-|Time|0.000031s|0.395721s|0.000016s|0.000022s|0.000025s|0.000023s|0.000022s|
+|Time|0.000031s|0.204331s|0.000016s|0.000022s|0.000025s|0.000023s|0.000022s|
 
 ## Autores
-- José Torres
-- Miguel Gomes 
-- Rodrigo Castro
+José Torres
+Miguel Gomes 
+Rodrigo Castro
