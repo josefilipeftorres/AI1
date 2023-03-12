@@ -73,6 +73,6 @@ Por exemplo, *ConfigSol12.txt*:
 |Time|0.000031s|0.395721s|0.000016s|0.000022s|0.000025s|0.000023s|0.000022s|
 
 ## Autores
-José Torres
-Miguel Gomes 
-Rodrigo Castro
+- José Torres
+- Miguel Gomes 
+- Rodrigo Castro
