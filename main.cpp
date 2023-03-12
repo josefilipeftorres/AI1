@@ -23,7 +23,7 @@ void readConfigFile(char *inputFile, Game *initConf, Game *goalConf);
 bool checkIfSolvable(Game *initConf, Game *goalConf);
 void debugBoard(Game *initConf, Game *goalConf);
 void BFS(Game *initConf, Game *goalConf);
-bool DFS(Game *initConf, Game *goalConf, int depth);
+bool DFS(Game *initConf, Game *goalConf, int depth,int flag);
 void IDFS(Game *initConf, Game *goalConf);
 void AStarMisplacedTiles(Game *initConf, Game *goalConf);
 void AStarManhattanDistance(Game *initConf, Game *goalConf);
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     }
     else if (algorithm == "DFS")
     {
-        DFS(initConf, goalConf, 20);
+        DFS(initConf, goalConf, 20,0);
     }
     else if (algorithm == "IDFS")
     {
@@ -250,7 +250,7 @@ void BFS(Game *initConf, Game *goalConf)
     }
 }
 
-bool DFS(Game *initConf, Game *goalConf, int depth)
+bool DFS(Game *initConf, Game *goalConf, int depth, int flag)
 {
     stack<pair<Game *, int>> s; // store current depth of each node
     s.push(make_pair(initConf, 0));
@@ -278,8 +278,12 @@ bool DFS(Game *initConf, Game *goalConf, int depth)
         // Check if we have reached the maximum depth
         if (cur.second >= depth)
         {
-            visited.clear();
             continue;
+        }
+
+        if(flag == 1) {
+            //printf("Currently exploring depth %d", cur.second + 1);
+            visited.clear();
         }
 
         // Get the possible moves from the current node
@@ -308,7 +312,7 @@ void IDFS(Game *initConf, Game *goalConf)
 {
     int i = 0;
     cout << "Currently exploring depth 0\n";
-    while (!DFS(initConf, goalConf, i))
+    while (!DFS(initConf, goalConf, i,1))
     {
         cout << "Currently exploring depth " << (++i) << '\n';
     }
